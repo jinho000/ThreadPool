@@ -1,19 +1,20 @@
 #include <iostream>
 #include "ThreadPool.h"
 
+
 using namespace std;
 
-void Func()
+
+void Test()
 {
-	
+	cout << "test \n";
 }
 
 int main()
 {
-	ThreadPool pool(100);
+	ThreadPool pool(60);
 
-	pool.AddWork([]() { Func(); });
-	
+	pool.AddWork([]() { Test(); });
 
 	return 0;
 }

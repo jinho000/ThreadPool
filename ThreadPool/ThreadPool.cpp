@@ -59,7 +59,7 @@ ThreadPool::~ThreadPool()
 		SetEvent(m_eventHandleArry[i]);
 	}
 
-	WaitForMultipleObjects(m_threadCount, m_threadHandleArry.data(), false, INFINITE);
+	WaitForMultipleObjects(m_threadCount, m_threadHandleArry.data(), TRUE, INFINITE);
 
 	for (int i = 0; i < m_threadCount; ++i)
 	{
@@ -87,8 +87,6 @@ DWORD WINAPI ThreadPool::WorkThreadFunc(LPVOID _threadPoolObjectAddr)
 			cout << "Error " + std::to_string(error) + "\n";
 		}
 
-		//cout << std::to_string(result) + "\n";
-		
 		pThreadPoolObj->WorkJob();
 
 		pThreadPoolObj->m_bDestroyMutex.lock();
@@ -108,7 +106,7 @@ void ThreadPool::WorkJob()
 	std::function<void()> job;
 
 	{
-		std::lock_guard lock(m_jobQueueMutex);
+		std::lock_guard<std::mutex> lock(m_jobQueueMutex);
 
 		if (m_jobQueue.empty() == true)
 			return;	
