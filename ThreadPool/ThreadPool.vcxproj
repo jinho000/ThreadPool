@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CircularQueue.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ThreadPool.cpp">
       <SubType>
@@ -148,6 +149,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CircularQueue.h" />
     <ClInclude Include="ThreadPool.h">
       <SubType>
       </SubType>

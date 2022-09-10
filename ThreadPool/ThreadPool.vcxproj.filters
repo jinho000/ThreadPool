@@ -5,15 +5,24 @@
     <ClCompile Include="ThreadPool.cpp">
       <Filter>ThreadPool</Filter>
     </ClCompile>
+    <ClCompile Include="CircularQueue.cpp">
+      <Filter>CircularQueue</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="ThreadPool">
       <UniqueIdentifier>{7898f405-1c3b-4a4e-b0cf-c4dcd7d216f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CircularQueue">
+      <UniqueIdentifier>{9230490e-9ba6-417a-b983-3b0e6dd37ca5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThreadPool.h">
       <Filter>ThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="CircularQueue.h">
+      <Filter>CircularQueue</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
