@@ -16,6 +16,9 @@
     <Filter Include="CircularQueue">
       <UniqueIdentifier>{9230490e-9ba6-417a-b983-3b0e6dd37ca5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{5ae87263-df90-4366-8080-e670f06498bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThreadPool.h">
