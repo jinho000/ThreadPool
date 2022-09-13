@@ -4,30 +4,29 @@
 #include <mutex>
 #include <functional>
 #include <vector>
-
+#include <thread>
+#include <condition_variable>
 
 class ThreadPool
 {
 private: 
-	std::vector<HANDLE> m_eventHandleArry;
-	std::vector<HANDLE> m_threadHandleArry;
-	std::vector<DWORD>  m_threadIDArry;
-	UINT				m_threadCount;
-	
+	UINT								m_threadCount;
+
+	std::vector<std::thread>			m_threadArry;
+	std::condition_variable				m_conditionalVariable;
+
 	std::queue<std::function<void()>>	m_jobQueue;
 	std::mutex							m_jobQueueMutex;
 
-	bool								m_bDestroyThread;
-	std::mutex							m_bDestroyMutex;
+	bool								m_bStopAll;
+
 public: // default
 	ThreadPool(UINT _threadCount);
 	~ThreadPool();
 
 
 private:
-	static DWORD WINAPI WorkThreadFunc(LPVOID lpParameter);
-
-	void WorkJob();
+	static void ThreadWork(ThreadPool& _pThreadPool);
 
 public: // member Func
 
