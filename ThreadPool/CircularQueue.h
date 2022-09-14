@@ -1,31 +1,27 @@
 #pragma once
 
-// 용도 :
-// 분류 :
-// 첨언 :
+
 class CircularQueue
 {
 private: // member var
-	enum { SIZE = 1024 };
-
-	int		m_ringBuffer[SIZE];
+	void**	m_ringBuffer;
 	int		m_front;
 	int		m_rear;
+	size_t	m_bufferSize;
 
 public: // default
-	CircularQueue();
+	CircularQueue(size_t _bufferSize);
 	~CircularQueue();
 
 public: 
-	int Size();
+	size_t Size();
 
 	bool IsEmpty();
 	bool IsFull();
 
-	void Enqueue(int _value);
+	void Enqueue(void* _memoryAddress);
 	void Dequeue();
 
-	int Front();
-	int Rear();
+	void* Front();
 };
 

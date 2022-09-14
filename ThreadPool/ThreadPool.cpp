@@ -5,16 +5,14 @@
 
 using namespace std;
 
-#define BIND_FUNC(fn) [fn](){fn();} 
 ThreadPool::ThreadPool(UINT _threadCount)
 	: m_threadCount(_threadCount)
 	, m_bStopAll(false)
 {
 	for (int i = 0; i < m_threadCount; ++i)
 	{
-		m_threadArry.push_back(std::thread([this]() {this->ThreadWork(*this); }));
+		m_threadArry.push_back(std::thread(&ThreadPool::ThreadWork, this));
 	}
-
 }
 
 ThreadPool::~ThreadPool()
@@ -29,38 +27,30 @@ ThreadPool::~ThreadPool()
 }
 
 
-void ThreadPool::ThreadWork(ThreadPool& _pThreadPool)
+void ThreadPool::ThreadWork()
 {
 	while (true)
 	{
-		std::unique_lock<std::mutex> lock(_pThreadPool.m_jobQueueMutex);
-		_pThreadPool.m_conditionalVariable.wait(lock, [&_pThreadPool]() {
-			return _pThreadPool.m_jobQueue.empty() == false || _pThreadPool.m_bStopAll == true; });
+		std::unique_lock<std::mutex> lock(m_jobQueueMutex);
 
-		if (_pThreadPool.m_bStopAll == true && _pThreadPool.m_jobQueue.empty() == true)
-		{
+		// job이 올때까지 대기
+		// 스레드 종료시 마지막 남은 작업까지 완료 후 종료한다
+		m_conditionalVariable.wait(lock, [this]() {
+			return this->m_jobQueue.empty() == false || this->m_bStopAll == true;
+		});
+
+		// 종료조건 처리
+		if (m_bStopAll == true && m_jobQueue.empty() == true)
 			return;
-		}
-
-		std::function<void()> job;
-		{
-			if (_pThreadPool.m_jobQueue.empty() == true)
-				return;
-
-			job = std::move(_pThreadPool.m_jobQueue.front());
-			_pThreadPool.m_jobQueue.pop();
-		}
-
+		
+		std::function<void()> job = std::move(m_jobQueue.front());
+		m_jobQueue.pop();
+		
 		lock.unlock();
 
-		if (job != nullptr)
-		{
-			job();
-		}
+		job();
 	}
 }
-
-
 
 // 템플릿 가변인자 바꾸기
 void ThreadPool::AddWork(std::function<void()> _delegateWork)

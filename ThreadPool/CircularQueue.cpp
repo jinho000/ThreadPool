@@ -1,54 +1,82 @@
 #include "CircularQueue.h"
 #include <cassert>
 
-CircularQueue::CircularQueue()
+CircularQueue::CircularQueue(size_t _bufferSize)
     : m_ringBuffer()
-    , m_front(0)
-    , m_rear(0)
+    , m_front(-1)
+    , m_rear(-1)
+    , m_bufferSize(_bufferSize)
 {
-    //m_ringBuffer = new int[_bufferSize];
+    m_ringBuffer = new void* [_bufferSize];
 }
 
 CircularQueue::~CircularQueue()
 {
-    //delete m_ringBuffer;
+    delete[] m_ringBuffer;
+    m_ringBuffer = nullptr;
 }
 
-int CircularQueue::Size()
+size_t CircularQueue::Size()
 {
     return m_front < m_rear ? m_rear - m_front : m_front - m_rear;
 }
 
 bool CircularQueue::IsEmpty()
 {
-    return m_front == m_rear;
+    return m_front == -1;
 }
 
 bool CircularQueue::IsFull()
 {
-    return (m_rear + 1) % SIZE == m_front;
+    if (m_front == 0 && m_rear == m_bufferSize - 1) 
+    {
+        return true;
+    }
+
+    if (m_front == m_rear + 1) 
+    {
+        return true;
+    }
+
+    return false;
 }
 
-void CircularQueue::Enqueue(int _value)
+void CircularQueue::Enqueue(void* _memoryAddress)
 {
     assert(IsFull() == false);
 
-    m_ringBuffer[m_rear] = _value;
-    m_rear = (m_rear + 1) % SIZE;
+    if (m_front == -1)
+    {
+        m_front = 0;
+    }
+
+    m_rear = (m_rear + 1) % m_bufferSize;
+    m_ringBuffer[m_rear] = _memoryAddress;    
 }
+
 
 void CircularQueue::Dequeue()
 {
     assert(IsEmpty() == false);
-    m_front = (m_front + 1) % SIZE;
+
+    if (m_front == m_rear) 
+    {
+        m_front = -1;
+        m_rear = -1;
+    }
+    else
+    {
+        m_front = (m_front + 1) % m_bufferSize;
+    }
 }
 
-int CircularQueue::Front()
+void* CircularQueue::Front()
 {
     return m_ringBuffer[m_front];
 }
 
-int CircularQueue::Rear()
-{
-    return m_ringBuffer[((m_rear + SIZE) - 1) % SIZE];
-}
+//int CircularQueue::Rear()
+//{
+//    return m_ringBuffer[((m_rear + m_bufferSize) - 1) % m_bufferSize];
+//}
+

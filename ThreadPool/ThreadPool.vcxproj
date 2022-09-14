@@ -143,6 +143,10 @@
   <ItemGroup>
     <ClCompile Include="CircularQueue.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MemoryPool.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <SubType>
       </SubType>
@@ -150,6 +154,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CircularQueue.h" />
+    <ClInclude Include="MemoryPool.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <SubType>
       </SubType>

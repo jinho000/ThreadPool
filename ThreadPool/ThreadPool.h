@@ -7,6 +7,8 @@
 #include <thread>
 #include <condition_variable>
 
+#define BIND_FUNC(fn) [](){ fn();} 
+
 class ThreadPool
 {
 private: 
@@ -24,9 +26,8 @@ public: // default
 	ThreadPool(UINT _threadCount);
 	~ThreadPool();
 
-
 private:
-	static void ThreadWork(ThreadPool& _pThreadPool);
+	void ThreadWork();
 
 public: // member Func
 
