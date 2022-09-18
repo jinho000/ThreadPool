@@ -14,77 +14,69 @@
 using namespace std;
 using namespace std::chrono;
 
-class Test
+constexpr long long ThreadOperationCount = 10000;
+constexpr long long OperationCount = 10000 * ThreadOperationCount;
+
+long long gNonAtomicValue = 0;
+atomic<long long> gAtomicValue = 0;
+
+void ThreadTest()
 {
-public:
-	int a;
-	double d;
-	char b;
+	long long value = 0;
+	for (long long i = 0; i < ThreadOperationCount; ++i)
+	{
+		++value;
+	}
 
-	virtual void func() {}
-};
+	gAtomicValue += value;
+}
 
-constexpr int MB = 1024 * 1024;
-constexpr int additional = 32;
-constexpr int Count = MB * additional;
-MemoryPool pool(Count * sizeof(Test), sizeof(Test));
-Test* pTestPoolArry[Count] = {};
-Test* pTestNewArry[Count] = {};
 
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
-	cout << "Test Object Size: " << sizeof(Test) << endl;
-	cout << "Test Object Count: " << Count << endl;
-	cout << "Test Memory Size: " << additional * sizeof(Test) << "MB" << endl << endl;
+	{
+		//ThreadPool pool(19, 10);
+	}
+
+	cout << "Operation Count: " << OperationCount << endl << endl;
 
 
-	///////////////////////
+	//////////////////////////////
 
-	cout << "Test Pool Allocate" << endl;
+	cout << "Test Multi Thread" << endl;
+
 	auto start = high_resolution_clock::now();
-
-	for (int i = 0; i < Count; ++i)
 	{
-		pTestPoolArry[i] = reinterpret_cast<Test*>(pool.Allocate());
-		pTestPoolArry[i]->a = i;
-		pTestPoolArry[i]->b = 'b';
-		pTestPoolArry[i]->d = 3.2;
+		ThreadPool threadPool(std::thread::hardware_concurrency(), 100);
+		constexpr long long addWorkCount = OperationCount / ThreadOperationCount;
+		for (long long i = 0; i < addWorkCount; ++i)
+		{
+			threadPool.AddWork([]() { ThreadTest(); });
+		}
 	}
-
-	for (int i = 0; i < Count; ++i)
-	{
-		pool.DeAllocate(pTestPoolArry[i]);
-		pTestPoolArry[i] = NULL;
-	}
-	
 	auto end = high_resolution_clock::now();
+
+	cout << "Operation Result: " << gAtomicValue << endl;
 	duration<double> checkTime = end - start;
 	std::cout << "time: " << checkTime.count() << "s" << endl << endl;
 	
 
-	////////////////////
+	///////////////////////////////
 
-	cout << "Test New Allocate " << endl;
-	start = high_resolution_clock::now();
-	for (int i = 0; i < Count; ++i)
-	{
-		pTestNewArry[i] = new Test;
-		pTestNewArry[i]->a = i;
-		pTestNewArry[i]->b = 'b';
-		pTestNewArry[i]->d = 3.2;
-	}
+	//cout << "Test Single Thread" << endl;
 
-	for (int i = 0; i < Count; ++i)
-	{
-		delete pTestNewArry[i];
-		pTestNewArry[i] = NULL;
-	}
+	//start = high_resolution_clock::now();
+	//for (long long i = 0; i < OperationCount; ++i)
+	//{
+	//	++gNonAtomicValue;
+	//}
+	//end = high_resolution_clock::now();
 
-	end = high_resolution_clock::now();
-	checkTime = end - start;
-	std::cout << "time: " << checkTime.count() << "s" << endl;
+	//cout << "Operation Result: " << gNonAtomicValue << endl;
+	//checkTime = end - start;
+	//std::cout << "time: " << checkTime.count() << "s" << endl;
 
 	return 0;
 }

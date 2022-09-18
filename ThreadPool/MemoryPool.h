@@ -9,7 +9,7 @@ private: // member var
 	size_t			m_fixedSize;
 
 public: // default
-	MemoryPool(size_t _momerySize, size_t _fixedSize);
+	MemoryPool(size_t _memorySize, size_t _fixedSize);
 	~MemoryPool();
 
 public: // member Func
