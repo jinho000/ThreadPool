@@ -7,6 +7,7 @@
 #include <functional>
 #include <chrono>
 #include <iomanip>
+#include <stack>
 
 #include "ThreadPool.h"
 #include "MemoryPool.h"
@@ -28,23 +29,11 @@ void ThreadTest()
 		++value;
 	}
 
-	gAtomicValue += value;
+	gAtomicValue.exchange(value);
 }
 
-
-int main()
+void TestThreadPool()
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	
-	{
-		//ThreadPool pool(19, 10);
-	}
-
-	cout << "Operation Count: " << OperationCount << endl << endl;
-
-
-	//////////////////////////////
-
 	cout << "Test Multi Thread" << endl;
 
 	auto start = high_resolution_clock::now();
@@ -61,22 +50,83 @@ int main()
 	cout << "Operation Result: " << gAtomicValue << endl;
 	duration<double> checkTime = end - start;
 	std::cout << "time: " << checkTime.count() << "s" << endl << endl;
+}
+
+struct TestMemPool
+{
+	int a;
+	int b;
+	int c;
+};
+
+constexpr int testCount = 8;
+constexpr int countMem = 1024 * 1024 * testCount;
+TestMemPool* intArray[countMem] = {};
+TestMemPool* intArrayNew[countMem] = {};
+
+void TestMemoryPool()
+{
+	cout << "Test Size: " << testCount * sizeof(TestMemPool) << "MB" << endl;
+
+	MemoryPool pool(countMem * sizeof(TestMemPool), sizeof(TestMemPool));
 	
+	auto start = high_resolution_clock::now();
+	
+	for (int i = 0; i < countMem / 4; ++i)
+	{
+		intArray[i] = (TestMemPool*)pool.Allocate();
+	}
 
-	///////////////////////////////
+	for (int i = 0; i < countMem / 4; ++i)
+	{
+		pool.DeAllocate(intArray[i]);
+	}
 
-	//cout << "Test Single Thread" << endl;
+	auto end = high_resolution_clock::now();
 
-	//start = high_resolution_clock::now();
-	//for (long long i = 0; i < OperationCount; ++i)
-	//{
-	//	++gNonAtomicValue;
-	//}
-	//end = high_resolution_clock::now();
+	duration<double> checkTime = end - start;
+	std::cout << "time: " << checkTime.count() << "s" << endl << endl;
 
-	//cout << "Operation Result: " << gNonAtomicValue << endl;
-	//checkTime = end - start;
-	//std::cout << "time: " << checkTime.count() << "s" << endl;
+
+	start = high_resolution_clock::now();
+
+	for (int i = 0; i < countMem / 4; ++i)
+	{
+		intArrayNew[i] = new TestMemPool;
+	}
+
+	for (int i = 0; i < countMem / 4; ++i)
+	{
+		delete intArrayNew[i];
+	}
+
+	end = high_resolution_clock::now();
+
+	checkTime = end - start;
+	std::cout << "time: " << checkTime.count() << "s" << endl << endl;
+}
+
+HANDLE hCSemaphore = CreateSemaphore(NULL, 0, 1, NULL);
+
+void TestThread()
+{
+	int result = WaitForSingleObject(hCSemaphore, INFINITE);
+
+	int a = 0;
+}
+
+int main()
+{
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	
+	std::thread t1(TestThread);
+
+	string input;
+	cin >> input;
+
+	CloseHandle(hCSemaphore);
+
+	t1.join();
 
 	return 0;
 }

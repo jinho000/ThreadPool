@@ -16,4 +16,3 @@ public: // member Func
 	void* Allocate();
 	void DeAllocate(void* _address);
 };
-
